@@ -4,13 +4,16 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { Product } from './schema/products.schema';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ProductsService {
-  constructor(@InjectModel(Product.name) private productsModel: Model<any>) { }
+  constructor(@InjectModel(Product.name) private productsModel: Model<any>, private usersService: UsersService) { }
 
   async create(userId: string, createProductDto: CreateProductDto) {
-    const newProduct = await this.productsModel.create({...createProductDto, user: userId})
+    const user = await this.usersService.findOne(userId)
+    const newProduct = await this.productsModel.create({ ...createProductDto, user: user._id })
+    await this.usersService.addProduct(userId, newProduct._id)
     return newProduct;
   }
 

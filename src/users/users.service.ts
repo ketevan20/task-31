@@ -40,4 +40,9 @@ export class UsersService {
     if(!removedUserById) throw new BadRequestException()
     return removedUserById;
   }
+
+  async addProduct(userId, productId) {
+    const updatedUser = this.userModel.findByIdAndUpdate(userId, {$push: {products: productId}})
+    return updatedUser;
+  }
 }
